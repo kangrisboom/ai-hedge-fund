@@ -7,16 +7,18 @@ readme = "README.md"
 packages = [
     { include = "src", from = "." }
 ]
+
 [tool.poetry.dependencies]
 python = "^3.9"
+httpx = "0.27.0"
 langchain = "0.3.0"
 langchain-anthropic = "0.3.5"
 langchain-groq = "0.2.3"
 langchain-openai = "0.3"
 langgraph = "0.2.56"
-pandas = "^2.1.0"
-numpy = "^1.24.0"
-python-dotenv = "1.0.0"
+pandas = {version = "2.2.1", extras = ["pyarrow", "performance"]}
+numpy = "1.26.4"
+python-dotenv = "1.0.1"
 matplotlib = "^3.9.2"
 tabulate = "^0.9.0"
 colorama = "^0.4.6"
@@ -24,16 +26,21 @@ questionary = "^2.1.0"
 rich = "^13.9.4"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-black = "^23.7.0"
-isort = "^5.12.0"
-flake8 = "^6.1.0"
+pytest = "8.0.2"
+black = "24.2.0"
+isort = "5.13.2"
+flake8 = "7.0.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 420
-target-version = ['py39']
+target-version = ['py311']
 include = '\.pyi?$'
+
+[tool.pandas]
+max_rows = 100
+precision = 6
+float_format = "%.2f"

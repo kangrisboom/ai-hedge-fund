@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import requests
+from typing import Optional
+import httpx
 
 from data.cache import get_cache
 from data.models import (
@@ -15,6 +17,7 @@ from data.models import (
     InsiderTrade,
     InsiderTradeResponse,
 )
+from .openrouter_config import OPENROUTER_API_BASE, get_model_config
 
 # Global cache instance
 _cache = get_cache()
@@ -280,3 +283,59 @@ def prices_to_df(prices: list[Price]) -> pd.DataFrame:
 def get_price_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
     prices = get_prices(ticker, start_date, end_date)
     return prices_to_df(prices)
+
+
+class OpenRouterClient:
+    def __init__(self):
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
+        if not self.api_key:
+            raise ValueError("OPENROUTER_API_KEY environment variable not set")
+        
+    async def generate(self, 
+                      prompt: str, 
+                      model: str = "claude-3-sonnet",
+                      max_tokens: Optional[int] = None) -> str:
+        model_config = get_model_config(model)
+        if not model_config:
+            raise ValueError(f"Unsupported model: {model}")
+            
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "HTTP-Referer": "https://github.com/virattt/ai-hedge-fund",
+            "X-Title": "AI Hedge Fund"
+        }
+        
+        data = {
+            "model": model_config["name"],
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": max_tokens
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{OPENROUTER_API_BASE}/chat/completions",
+                headers=headers,
+                json=data
+            )
+            response.raise_for_status()
+            return response.json()["choices"][0]["message"]["content"]
+
+# Update the main API class to include OpenRouter
+class API:
+    def __init__(self):
+        self.openai_client = None  # Initialize if OPENAI_API_KEY exists
+        self.groq_client = None    # Initialize if GROQ_API_KEY exists
+        self.openrouter_client = None
+        
+        if os.getenv("OPENROUTER_API_KEY"):
+            self.openrouter_client = OpenRouterClient()
+            
+    async def generate(self, prompt: str, model: str = "claude-3-sonnet") -> str:
+        if model.startswith("openrouter/"):
+            if not self.openrouter_client:
+                raise ValueError("OpenRouter client not initialized")
+            return await self.openrouter_client.generate(
+                prompt, 
+                model=model.replace("openrouter/", "")
+            )
+        # ...existing code for other providers...

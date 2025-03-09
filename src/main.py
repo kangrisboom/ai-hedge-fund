@@ -9,7 +9,7 @@ from agents.ben_graham import ben_graham_agent
 from agents.bill_ackman import bill_ackman_agent
 from agents.fundamentals import fundamentals_agent
 from agents.portfolio_manager import portfolio_management_agent
-from agents.technicals import technical_analyst_agent
+# Remove unused import
 from agents.risk_manager import risk_management_agent
 from agents.sentiment import sentiment_agent
 from agents.warren_buffett import warren_buffett_agent
@@ -140,7 +140,7 @@ def create_workflow(selected_analysts=None):
     return workflow
 
 
-if __name__ == "__main__":
+def parse_args():
     parser = argparse.ArgumentParser(description="Run the hedge fund trading system")
     parser.add_argument(
         "--initial-cash",
@@ -165,8 +165,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--show-agent-graph", action="store_true", help="Show the agent graph"
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="openrouter/claude-3-sonnet",
+        help="Model to use (openrouter/claude-3-opus, openrouter/mixtral, etc.)"
+    )
+    return parser.parse_args()
 
-    args = parser.parse_args()
+
+if __name__ == "__main__":
+    args = parse_args()
 
     # Parse tickers from comma-separated string
     tickers = [ticker.strip() for ticker in args.tickers.split(",")]

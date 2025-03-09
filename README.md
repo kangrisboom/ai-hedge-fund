@@ -55,23 +55,46 @@ git clone https://github.com/virattt/ai-hedge-fund.git
 cd ai-hedge-fund
 ```
 
-1. Install Poetry (if not already installed):
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
+1. Install Python 3.9 or higher from [python.org](https://www.python.org/downloads/)
+
+2. Install Poetry:
+
+For Windows (PowerShell), run as administrator:
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 ```
 
-2. Install dependencies:
-```bash
+Add Poetry to PATH and verify installation:
+```powershell
+# Add to PATH
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:APPDATA\Python\Scripts", "User")
+
+# Refresh environment variables in current terminal
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Verify installation
+poetry --version
+```
+
+3. Install dependencies:
+```powershell
+# Configure poetry to create virtual environment in project directory
+poetry config virtualenvs.in-project true
+
+# Install dependencies
 poetry install
+
+# Generate lock file if needed
+poetry lock
 ```
 
-3. Set up your environment variables:
-```bash
+4. Set up environment variables:
+```powershell
 # Create .env file for your API keys
-cp .env.example .env
+copy .env.example .env
 ```
 
-4. Set your API keys:
+5. Set your API keys:
 ```bash
 # For running LLMs hosted by openai (gpt-4o, gpt-4o-mini, etc.)
 # Get your OpenAI API key from https://platform.openai.com/
@@ -81,16 +104,36 @@ OPENAI_API_KEY=your-openai-api-key
 # Get your Groq API key from https://groq.com/
 GROQ_API_KEY=your-groq-api-key
 
+# For running LLMs through OpenRouter (claude-3, mistral, etc.)
+# Get your OpenRouter API key from https://openrouter.ai/
+OPENROUTER_API_KEY=your-openrouter-api-key
+
 # For getting financial data to power the hedge fund
 # Get your Financial Datasets API key from https://financialdatasets.ai/
 FINANCIAL_DATASETS_API_KEY=your-financial-datasets-api-key
 ```
 
-**Important**: You must set `OPENAI_API_KEY`, `GROQ_API_KEY`, or `ANTHROPIC_API_KEY` for the hedge fund to work.  If you want to use LLMs from all providers, you will need to set all API keys.
+**Important**: You must set at least one of these API keys for the hedge fund to work:
+- `OPENAI_API_KEY` - For OpenAI models (GPT-4, GPT-3.5)
+- `GROQ_API_KEY` - For Groq-hosted models (LLaMA, DeepSeek)  
+- `OPENROUTER_API_KEY` - For OpenRouter models (Claude-3, Mistral)
+- `ANTHROPIC_API_KEY` - For Anthropic models (Claude)
+
+If you want to use models from all providers, you will need to set all API keys.
 
 Financial data for AAPL, GOOGL, MSFT, NVDA, and TSLA is free and does not require an API key.
 
 For any other ticker, you will need to set the `FINANCIAL_DATASETS_API_KEY` in the .env file.
+
+Note: After installing Poetry, you may need to:
+1. Close and reopen your terminal
+2. Or restart Visual Studio Code
+3. Or restart your computer
+
+You can verify the installation by running:
+```powershell
+%APPDATA%\Python\Scripts\poetry --version
+```
 
 ## Usage
 

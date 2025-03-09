@@ -2,6 +2,7 @@ import os
 from langchain_anthropic import ChatAnthropic
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 from enum import Enum
 from pydantic import BaseModel
 from typing import Tuple
@@ -12,6 +13,7 @@ class ModelProvider(str, Enum):
     OPENAI = "OpenAI"
     GROQ = "Groq"
     ANTHROPIC = "Anthropic"
+    OPENROUTER = "OpenRouter"  # Add OpenRouter provider
 
 
 class LLMModel(BaseModel):
@@ -76,6 +78,26 @@ AVAILABLE_MODELS = [
         model_name="o3-mini",
         provider=ModelProvider.OPENAI
     ),
+    LLMModel(
+        display_name="[openrouter] claude-3-opus",
+        model_name="anthropic/claude-3-opus-20240229",
+        provider=ModelProvider.OPENROUTER
+    ),
+    LLMModel(
+        display_name="[openrouter] claude-3-sonnet",
+        model_name="anthropic/claude-3-sonnet-20240229", 
+        provider=ModelProvider.OPENROUTER
+    ),
+    LLMModel(
+        display_name="[openrouter] mixtral-8x7b",
+        model_name="mistralai/mixtral-8x7b-instruct",
+        provider=ModelProvider.OPENROUTER
+    ),
+    LLMModel(
+        display_name="[openrouter] mistral-7b",
+        model_name="mistralai/mistral-7b-instruct",
+        provider=ModelProvider.OPENROUTER
+    ),
 ]
 
 # Create LLM_ORDER in the format expected by the UI
@@ -85,7 +107,7 @@ def get_model_info(model_name: str) -> LLMModel | None:
     """Get model information by model_name"""
     return next((model for model in AVAILABLE_MODELS if model.model_name == model_name), None)
 
-def get_model(model_name: str, model_provider: ModelProvider) -> ChatOpenAI | ChatGroq | None:
+def get_model(model_name: str, model_provider: ModelProvider) -> BaseChatModel | None:
     if model_provider == ModelProvider.GROQ:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -107,3 +129,19 @@ def get_model(model_name: str, model_provider: ModelProvider) -> ChatOpenAI | Ch
             print(f"API Key Error: Please make sure ANTHROPIC_API_KEY is set in your .env file.")
             raise ValueError("Anthropic API key not found.  Please make sure ANTHROPIC_API_KEY is set in your .env file.")
         return ChatAnthropic(model=model_name, api_key=api_key)
+    elif model_provider == ModelProvider.OPENROUTER:
+        api_key = os.getenv("OPENROUTER_API_KEY")
+        if not api_key:
+            print(f"API Key Error: Please make sure OPENROUTER_API_KEY is set in your .env file.")
+            raise ValueError("OpenRouter API key not found. Please make sure OPENROUTER_API_KEY is set in your .env file.")
+        
+        # Configure OpenRouter with base URL and headers
+        return ChatOpenAI(
+            model=model_name,
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1",
+            headers={
+                "HTTP-Referer": "https://github.com/virattt/ai-hedge-fund",
+                "X-Title": "AI Hedge Fund"
+            }
+        )

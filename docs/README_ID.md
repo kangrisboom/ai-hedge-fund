@@ -1,5 +1,7 @@
 # AI Hedge Fund
 
+[English](../README.md) | [Bahasa Indonesia](README_ID.md)
+
 Ini adalah bukti konsep untuk hedge fund yang ditenagai oleh AI. Tujuan dari proyek ini adalah untuk mengeksplorasi penggunaan AI dalam membuat keputusan trading. Proyek ini hanya untuk tujuan **edukasi** dan tidak dimaksudkan untuk trading atau investasi nyata.
 
 Sistem ini menggunakan beberapa agen yang bekerja bersama:
@@ -39,35 +41,85 @@ git clone https://github.com/virattt/ai-hedge-fund.git
 cd ai-hedge-fund
 ```
 
-1. Install Poetry (jika belum terinstall):
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
+1. Install Python 3.9 atau lebih tinggi dari [python.org](https://www.python.org/downloads/)
+
+2. Install Poetry:
+
+Untuk Windows (PowerShell), jalankan sebagai administrator:
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 ```
 
-2. Install dependencies:
-```bash
+Tambahkan Poetry ke PATH dan verifikasi instalasi:
+```powershell
+# Tambahkan ke PATH
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:APPDATA\Python\Scripts", "User")
+
+# Perbarui variabel lingkungan di terminal saat ini
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Verifikasi instalasi
+poetry --version
+```
+
+3. Install dependensi:
+```powershell
+# Konfigurasi poetry untuk membuat virtual environment di direktori proyek
+poetry config virtualenvs.in-project true
+
+# Install dependensi
 poetry install
+
+# Generate file lock jika diperlukan
+poetry lock
 ```
 
-3. Atur variabel lingkungan:
-```bash
+4. Pengaturan variabel lingkungan:
+```powershell
 # Buat file .env untuk API key Anda
-cp .env.example .env
+copy .env.example .env
 ```
 
-4. Atur API key:
+5. Atur API key Anda:
 ```bash
-# Untuk menjalankan LLM yang di-host oleh OpenAI (gpt-4, gpt-4-mini, dll.)
+# Untuk menjalankan LLM yang di-host oleh OpenAI (gpt-4o, gpt-4o-mini, dll.)
+# Dapatkan API key OpenAI dari https://platform.openai.com/
 OPENAI_API_KEY=api-key-openai-anda
 
 # Untuk menjalankan LLM yang di-host oleh Groq (deepseek, llama3, dll.)
+# Dapatkan API key Groq dari https://groq.com/
 GROQ_API_KEY=api-key-groq-anda
 
+# Untuk menjalankan LLM melalui OpenRouter (claude-3, mistral, dll.)
+# Dapatkan API key OpenRouter dari https://openrouter.ai/
+OPENROUTER_API_KEY=api-key-openrouter-anda
+
 # Untuk mendapatkan data keuangan
+# Dapatkan API key Financial Datasets dari https://financialdatasets.ai/
 FINANCIAL_DATASETS_API_KEY=api-key-financial-datasets-anda
 ```
 
-**Penting**: Anda harus mengatur `OPENAI_API_KEY`, `GROQ_API_KEY`, atau `ANTHROPIC_API_KEY` agar hedge fund dapat berfungsi.
+**Penting**: Anda harus mengatur setidaknya satu dari API key berikut agar hedge fund dapat berfungsi:
+- `OPENAI_API_KEY` - Untuk model OpenAI (GPT-4, GPT-3.5)
+- `GROQ_API_KEY` - Untuk model yang di-host Groq (LLaMA, DeepSeek)
+- `OPENROUTER_API_KEY` - Untuk model OpenRouter (Claude-3, Mistral)
+- `ANTHROPIC_API_KEY` - Untuk model Anthropic (Claude)
+
+Jika Anda ingin menggunakan model dari semua penyedia, Anda perlu mengatur semua API key.
+
+Data keuangan untuk AAPL, GOOGL, MSFT, NVDA, dan TSLA gratis dan tidak memerlukan API key.
+
+Untuk ticker lainnya, Anda perlu mengatur `FINANCIAL_DATASETS_API_KEY` di file .env.
+
+Catatan: Setelah menginstal Poetry, Anda mungkin perlu:
+1. Tutup dan buka kembali terminal Anda
+2. Atau restart Visual Studio Code
+3. Atau restart komputer Anda
+
+Anda dapat memverifikasi instalasi dengan menjalankan:
+```powershell
+%APPDATA%\Python\Scripts\poetry --version
+```
 
 ## Penggunaan
 
