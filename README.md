@@ -1,5 +1,7 @@
 # AI Hedge Fund
 
+[English](README.md) | [Bahasa Indonesia](docs/README_ID.md)
+
 This is a proof of concept for an AI-powered hedge fund.  The goal of this project is to explore the use of AI to make trading decisions.  This project is for **educational** purposes only and is not intended for real trading or investment.
 
 This system employs several agents working together:
